@@ -2,7 +2,7 @@ FROM tomcat:9.0
 
 # 必要なパッケージをインストールし、キャッシュを削除
 RUN apt update && \
-    apt install -y python3-full python3-venv curl wget && \
+    apt install -y python3-full python3-venv curl wget unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # Python のバージョン確認
@@ -19,12 +19,18 @@ RUN /opt/venv/bin/python -m pip --version
 # gdown のインストール
 RUN /opt/venv/bin/python -m pip install --no-cache-dir gdown
 
-# Google Drive から GroupSession をダウンロード
-RUN /opt/venv/bin/python -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war || true
+# Google Drive から GroupSession をダウンロード（失敗時はエラーを出す）
+RUN /opt/venv/bin/python -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war \
+    && ls -lh /usr/local/tomcat/webapps/groupsession.war || (echo "Download failed!" && exit 1)
+
+# WAR ファイルを展開（展開しないと 404 Not Found になる可能性あり）
+RUN cd /usr/local/tomcat/webapps/ && \
+    unzip -o groupsession.war -d groupsession && \
+    rm groupsession.war
 
 # 環境変数を設定（仮想環境をデフォルトに）
 ENV PATH="/opt/venv/bin:$PATH"
 
 # ポートを公開し、Tomcat を実行
 EXPOSE 8080
-CMD ["catalina.sh", "run"]
+CMD ["sh", "-c", "exec catalina.sh run"]
