@@ -13,22 +13,20 @@ RUN python3 -m venv /opt/venv && \
     /opt/venv/bin/python -m ensurepip && \
     /opt/venv/bin/python -m pip install --upgrade pip setuptools wheel
 
-# pip のバージョン確認
-RUN /opt/venv/bin/python -m pip --version
-
-# gdown のインストール
+# gdown のインストール（バックアップ用）
 RUN /opt/venv/bin/python -m pip install --no-cache-dir gdown
 
-# Google Drive から GroupSession をダウンロード（失敗時はエラーを出す）
-RUN /opt/venv/bin/python -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war \
+# Google Drive から GroupSession をダウンロード（gdown が失敗した場合は wget を使用）
+RUN wget "https://drive.google.com/uc?export=download&id=1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris" -O /usr/local/tomcat/webapps/groupsession.war \
+    || /opt/venv/bin/python -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war \
     && ls -lh /usr/local/tomcat/webapps/groupsession.war || (echo "Download failed!" && exit 1)
 
-# WAR ファイルを展開（展開しないと 404 Not Found になる可能性あり）
+# WAR ファイルを展開
 RUN cd /usr/local/tomcat/webapps/ && \
     unzip -o groupsession.war -d groupsession && \
     rm groupsession.war
 
-# 環境変数を設定（仮想環境をデフォルトに）
+# 環境変数を設定
 ENV PATH="/opt/venv/bin:$PATH"
 
 # ポートを公開し、Tomcat を実行
