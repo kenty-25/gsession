@@ -18,8 +18,6 @@ RUN cd /usr/local/tomcat/webapps/ && \
 # 環境変数を設定
 ENV PATH="/opt/venv/bin:$PATH"
 
-# **Tomcat のポートを Render の PORT に変更**
-RUN sed -i 's/port="8080"/port="'${PORT}'"/' /usr/local/tomcat/conf/server.xml
-
-# Tomcat を起動
-CMD ["sh", "-c", "exec catalina.sh run"]
+# コンテナ起動時にポートを変更
+CMD sed -i 's/port="8080"/port="'${PORT:-8080}'"/' /usr/local/tomcat/conf/server.xml && \
+    exec catalina.sh run
