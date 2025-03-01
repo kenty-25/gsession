@@ -3,9 +3,11 @@ FROM tomcat:9.0
 # 必要なパッケージをインストールし、キャッシュを削除
 RUN apt update && \
     apt install -y python3 python3-pip && \
+    apt remove -y python3-wheel && \
+    apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# pip のアップグレード
+# pip のアップグレード（Debian の `wheel` を削除した後に実行）
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel --break-system-packages
 
 # gdown のインストール
