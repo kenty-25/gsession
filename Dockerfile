@@ -17,9 +17,10 @@ RUN python3 -m venv /opt/venv && \
 RUN /opt/venv/bin/python -m pip install --no-cache-dir gdown
 
 # Google Drive から GroupSession をダウンロード（gdown が失敗した場合は wget を使用）
-RUN wget "https://drive.google.com/uc?export=download&id=1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris" -O /usr/local/tomcat/webapps/groupsession.war \
-    || /opt/venv/bin/python -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war \
-    && ls -lh /usr/local/tomcat/webapps/groupsession.war || (echo "Download failed!" && exit 1)
+RUN wget -O /usr/local/tomcat/webapps/groupsession.war \
+    https://github.com/kenty-25/gsession/releases/download/v1.0.0/gsession.war && \
+    ls -lh /usr/local/tomcat/webapps/groupsession.war || (echo "Download failed!" && exit 1)
+
 
 # WAR ファイルを展開
 RUN cd /usr/local/tomcat/webapps/ && \
