@@ -11,7 +11,8 @@ RUN python3 -m pip install --upgrade pip setuptools wheel
 RUN python3 -m pip install --no-cache-dir gdown
 
 # Google Drive から GroupSession をダウンロード
-RUN gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war
+RUN wget --no-check-certificate -O /usr/local/tomcat/webapps/groupsession.war \
+    "https://drive.google.com/uc?export=download&id=1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris"
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
