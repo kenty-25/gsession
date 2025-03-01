@@ -5,17 +5,16 @@ WORKDIR /usr/local/tomcat/webapps
 
 # 必要なパッケージをインストールし、キャッシュを削除
 RUN apt update && \
-    apt install -y python3 python3-pip && \
-    apt remove -y python3-wheel && \
+    apt install -y python3 && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Python & pip のバージョン確認（デバッグ用）
-RUN python3 --version && pip3 --version
+RUN python3 --version && python3 -m ensurepip && python3 -m pip --version
 
 # pip のアップグレード
 RUN python3 -m ensurepip --default-pip && \
-    python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel --break-system-packages
+    python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel
 
 # gdown のインストール
 RUN python3 -m pip install --no-cache-dir gdown
