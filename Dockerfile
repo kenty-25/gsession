@@ -14,14 +14,14 @@ RUN cd /usr/local/tomcat/webapps/ && \
     unzip -o groupsession.war -d groupsession && \
     rm groupsession.war
 
-# Tomcat のポート設定を Render に適応
-RUN sed -i 's/port="8080"/port="'"$PORT"'"/' /usr/local/tomcat/conf/server.xml
+# Tomcat のポート設定を Render の `PORT` に変更
+RUN sed -i 's/port="8080"/port="'${PORT}'"/' /usr/local/tomcat/conf/server.xml
 
 # 環境変数の適用
 ENV CATALINA_OPTS="-Dserver.port=${PORT}"
 
 # ポートを公開
-EXPOSE 8080
+EXPOSE 8080  # これは Render 側が PORT を自動で設定するので変更しなくてもよい
 
 # Tomcat を起動
 CMD ["catalina.sh", "run"]
