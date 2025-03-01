@@ -16,8 +16,8 @@ RUN cd /usr/local/tomcat/webapps/ && \
     rm groupsession.war
 
 # Tomcat 設定を修正
-RUN sed -i 's/<Server port=\"[0-9]*\" shutdown=\"SHUTDOWN\"/<Server port=\"-1\" shutdown=\"SHUTDOWN\"/' /usr/local/tomcat/conf/server.xml && \
-    sed -i 's/<Connector port=\"[0-9]*\" protocol=\"HTTP\/1.1\"/<Connector port=\"${PORT}\" protocol=\"HTTP\/1.1\" address=\"0.0.0.0\"/' /usr/local/tomcat/conf/server.xml
+RUN sed -i 's/<Server port="[^"]*"/<Server port="-1"/' /usr/local/tomcat/conf/server.xml && \
+    sed -i 's/<Connector port="[^"]*"/<Connector port="8080" address="0.0.0.0"/' /usr/local/tomcat/conf/server.xml
 
 # 環境変数を設定
 ENV PATH="/opt/venv/bin:$PATH"
@@ -28,11 +28,8 @@ EXPOSE 8080
 
 # Health Check を追加
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/groupsession || exit 1
+  CMD curl -f http://localhost:8080/groupsession || exit 1
 
-# コンテナ起動時に環境変数 PORT を反映
-CMD export PORT=${PORT:-8080} && \
-    envsubst < /usr/local/tomcat/conf/server.xml > /tmp/server.xml && \
-    mv /tmp/server.xml /usr/local/tomcat/conf/server.xml && \
-    grep 'Connector port="' /usr/local/tomcat/conf/server.xml && \
+# Tomcat 起動前にポート設定を確認
+CMD cat /usr/local/tomcat/conf/server.xml | grep 'Connector port="' && \
     exec catalina.sh run
