@@ -18,6 +18,12 @@ RUN cd /usr/local/tomcat/webapps/ && \
 # 環境変数を設定
 ENV PATH="/opt/venv/bin:$PATH"
 
-# コンテナ起動時にポートを変更
-CMD sed -i 's/port="8080"/port="'${PORT:-8080}'"/' /usr/local/tomcat/conf/server.xml && \
+# コンテナのポートを明示的に公開
+EXPOSE 8080
+
+# コンテナ起動時に環境変数 PORT を反映
+CMD export PORT=${PORT:-8080} && \
+    sed -i "s/port=\"8080\"/port=\"${PORT}\"/" /usr/local/tomcat/conf/server.xml && \
+    echo "Updated server.xml with PORT=${PORT}" && \
+    grep 'port="' /usr/local/tomcat/conf/server.xml && \
     exec catalina.sh run
