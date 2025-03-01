@@ -13,7 +13,8 @@ RUN wget -O /usr/local/tomcat/webapps/groupsession.war \
 # WAR ファイルを展開
 RUN cd /usr/local/tomcat/webapps/ && \
     unzip -o groupsession.war -d groupsession && \
-    rm groupsession.war
+    ls -lh /usr/local/tomcat/webapps/groupsession && \
+    rm /usr/local/tomcat/webapps/groupsession.war
 
 # Tomcat 設定を修正
 RUN sed -i 's/<Server port="[^"]*"/<Server port="-1"/' /usr/local/tomcat/conf/server.xml && \
@@ -22,6 +23,7 @@ RUN sed -i 's/<Server port="[^"]*"/<Server port="-1"/' /usr/local/tomcat/conf/se
 # 環境変数を設定
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PORT=8080
+ENV CATALINA_HOME=/usr/local/tomcat
 
 # コンテナのポートを明示的に公開
 EXPOSE 8080
@@ -32,4 +34,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
 
 # Tomcat 起動前にポート設定を確認
 CMD cat /usr/local/tomcat/conf/server.xml | grep 'Connector port="' && \
-    exec catalina.sh run
+    exec /usr/local/tomcat/bin/catalina.sh run
