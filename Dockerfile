@@ -1,5 +1,8 @@
 FROM tomcat:9.0
 
+# 作業ディレクトリの設定
+WORKDIR /usr/local/tomcat/webapps
+
 # 必要なパッケージをインストールし、キャッシュを削除
 RUN apt update && \
     apt install -y python3 python3-pip && \
@@ -7,14 +10,18 @@ RUN apt update && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
+# Python & pip のバージョン確認（デバッグ用）
+RUN python3 --version && pip3 --version
+
 # pip のアップグレード
-RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel --break-system-packages
+RUN python3 -m ensurepip --default-pip && \
+    python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel --break-system-packages
 
 # gdown のインストール
 RUN python3 -m pip install --no-cache-dir gdown
 
 # Google Drive から GroupSession をダウンロード
-RUN python3 -m gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O /usr/local/tomcat/webapps/groupsession.war
+RUN gdown --id 1UOogBdYXtNCc6jOvGZPymxaV6AOz1ris -O groupsession.war
 
 # ポートを公開し、Tomcat を実行
 EXPOSE 8080
