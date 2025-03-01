@@ -6,7 +6,7 @@ RUN apt-get update && \
     apt-get install -y wget unzip curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Javaのインストール（AdoptOpenJDKのOpenJDK 11を使用）
+# Javaのインストール（OpenJDK 11を使用）
 RUN apt-get update && \
     apt-get install -y openjdk-11-jre && \
     java -version
@@ -20,16 +20,19 @@ RUN cd /usr/local/tomcat/webapps/ && \
     unzip -o groupsession.war -d groupsession && \
     rm groupsession.war
 
-# Tomcatの設定を修正（必要に応じて）
+# Tomcatの設定を修正
 RUN sed -i 's/<Server port="[^"]*"/<Server port="-1"/' /usr/local/tomcat/conf/server.xml && \
     sed -i 's/<Connector port="[^"]*"/<Connector port="8080" address="0.0.0.0"/' /usr/local/tomcat/conf/server.xml
+
+# WebSocket用のポート設定（必要に応じて）
+RUN sed -i 's/<Connector port="8080" protocol="HTTP\/1.1"/<Connector port="8080" protocol="HTTP\/1.1" upgradeProtocols="websocket"/' /usr/local/tomcat/conf/server.xml
 
 # 環境変数を設定
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 
 # コンテナで公開するポート
-EXPOSE 8080
+EXPOSE 8080 8009
 
 # Tomcatを起動するコマンド
 CMD ["catalina.sh", "run"]
