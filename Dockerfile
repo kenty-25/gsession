@@ -7,7 +7,7 @@ RUN apt update && \
     apt autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 
-# pip のアップグレード（Debian の `wheel` を削除した後に実行）
+# pip のアップグレード
 RUN python3 -m pip install --no-cache-dir --upgrade pip setuptools wheel --break-system-packages
 
 # gdown のインストール
