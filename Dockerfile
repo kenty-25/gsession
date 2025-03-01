@@ -23,7 +23,6 @@ EXPOSE 8080
 
 # コンテナ起動時に環境変数 PORT を反映
 CMD export PORT=${PORT:-8080} && \
-    sed -i "s/port=\"8080\"/port=\"${PORT}\"/" /usr/local/tomcat/conf/server.xml && \
-    echo "Updated server.xml with PORT=${PORT}" && \
-    grep 'port="' /usr/local/tomcat/conf/server.xml && \
+    sed -i "s/<Connector port=\"[0-9]*\" protocol=\"HTTP\/1.1\"/<Connector port=\"${PORT}\" protocol=\"HTTP\/1.1\"/" /usr/local/tomcat/conf/server.xml && \
+    grep 'Connector port="' /usr/local/tomcat/conf/server.xml && \
     exec catalina.sh run
