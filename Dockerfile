@@ -2,14 +2,16 @@ FROM tomcat:9.0
 
 # 必要なパッケージをインストールし、キャッシュを削除
 RUN apt update && \
-    apt install -y python3 python3-venv curl && \
+    apt install -y python3 python3-venv python3-pip wget && \
     rm -rf /var/lib/apt/lists/*
 
 # Python のバージョン確認
 RUN python3 --version
 
-# get-pip.py を使って pip をインストール（公式推奨）
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
+# get-pip.py をダウンロードして実行（エラー回避のため wget を使用）
+RUN wget https://bootstrap.pypa.io/get-pip.py -O /tmp/get-pip.py && \
+    python3 /tmp/get-pip.py && \
+    rm -f /tmp/get-pip.py
 
 # pip のバージョン確認（インストールが成功しているかチェック）
 RUN python3 -m pip --version
