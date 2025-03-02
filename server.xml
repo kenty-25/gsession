@@ -1,17 +1,21 @@
 <Server port="-1" shutdown="SHUTDOWN">
     <Service name="Catalina">
         
-        <!-- AJP Connector を有効にする場合 -->
-        <Connector protocol="AJP/1.3"
+        <!-- AJP Connector を使用しない場合は削除 -->
+        <!-- <Connector protocol="AJP/1.3"
                    address="0.0.0.0"
                    port="8009"
                    redirectPort="8443"
-                   secretRequired="false"/>
+                   secretRequired="false"/> -->
 
         <!-- HTTP/1.1の設定（WebSocketを含む）-->
         <Connector port="8080" protocol="HTTP/1.1"
                    connectionTimeout="20000"
                    redirectPort="8443"
                    upgradeProtocols="websocket" />
+
+        <!-- 不要なポート設定（ポート9110）の削除 -->
+        <!-- <Connector port="9110" protocol="HTTP/1.1" /> -->
+
     </Service>
 </Server>
